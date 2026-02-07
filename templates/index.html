@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disease Risk Prediction</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(120deg, #74ebd5, #9face6);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 420px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0 12px 0;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .high { color: red; font-weight: bold; }
+        .medium { color: orange; font-weight: bold; }
+        .low { color: green; font-weight: bold; }
+        canvas { margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Disease Risk Prediction System</h2>
+
+    <form action="/predict" method="post">
+        Age:
+        <input type="number" name="age" required min="0">
+
+        Gender:
+        <select name="gender">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+
+        Blood Pressure:
+        <input type="number" name="blood_pressure" required>
+
+        Sugar Level:
+        <input type="number" name="sugar_level" required>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction %}
+        <p class="{{ risk_color }}">Predicted Risk: {{ prediction }}</p>
+        <p>Risk Percentage: {{ risk_percentage }}%</p>
+
+        <h4>Doctor Suggestions:</h4>
+        <ul>
+            {% for tip in tips %}
+                <li>{{ tip }}</li>
+            {% endfor %}
+        </ul>
+
+        <canvas id="riskChart" width="300" height="300"></canvas>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Risk', 'Safe'],
+                    datasets: [{
+                        data: [{{ risk_percentage }}, {{ 100 - risk_percentage }}],
+                        backgroundColor: ['#ff4d4d', '#4CAF50']
+                    }]
+                }
+            });
+        </script>
+    {% endif %}
+</div>
+
+</body>
+</html>
